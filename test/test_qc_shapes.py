@@ -15,6 +15,10 @@ def qc_cls():
     """Set up basic test class"""
     x = MakeQCShapes(GRID, HABITAT, OUT_FOLDER)
     yield x
+    shps = [x for x in OUT_FOLDER.iterdir()]
+    #if shps:
+    #    for i in shps:
+    #        i.unlink()
 
 def test_class_set_up_with_test_data_and_data_exists(qc_cls):
     """Test instance and data exists"""
@@ -32,5 +36,27 @@ def test_gdf_of_shps_made(qc_cls):
     assert list(grid_gdf.columns) == ['NAME', 'OrthoID', 'geometry']
     assert int(hab_gdf['Id'][142]) == 39446
     assert grid_gdf['NAME'][4] == 'C19_L13'
- 
-    
+    assert grid_gdf.crs == {'init': 'epsg:32639'}
+    assert hab_gdf.crs == {'init': 'epsg:32639'}
+
+def test_shapefiles_made_for_each_tile(qc_cls):
+    """Shapefile made for each of the tiles"""
+    out_folders = [x for x in qc_cls.out_folder.iterdir()]
+    shps = []
+    for folder in out_folders:
+        shps.append([x.name for x in folder.iterdir() if x.name.endswith('.shp') if not x.name.endswith('points.shp')][0])
+    assert len(out_folders) == 9
+    assert 'WV_C19_L12.shp' in shps
+
+def test_random_points_saved_in_tile_folder(qc_cls):
+    """Test random points are saved in the folder with the tile and the points are contained by the tile"""
+    qc_cls.make_random_points(qc_cls.grid_gdf)
+    out_folders = [x for x in qc_cls.out_folder.iterdir()]
+    shps = []
+    for folder in out_folders:
+        shps.append([x.name for x in folder.iterdir() if x.name.endswith('points.shp')][0])
+    assert 'WV_C19_L12_points.shp' in shps
+    gdf_poly = gpd.read_file(str(BASE_DIR.joinpath('test/test_data/test_data_in/QC_Dissolved.shp')))
+    gdf_point = gpd.read_file(str(BASE_DIR.joinpath('test/test_data/test_data_out/WV_C20_L14/WV_C20_L14_points.shp')))
+    for _, i in gdf_point.iterrows():
+        assert gdf_poly['geometry'].contains(i['geometry']).all()
