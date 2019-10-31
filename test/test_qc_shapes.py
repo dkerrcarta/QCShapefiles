@@ -1,6 +1,8 @@
 from pathlib import Path
 import pytest
 import geopandas as gpd
+import numpy as np 
+import pandas as pd
 
 from make_qc_shapefiles.qc_shapes import MakeQCShapes 
 
@@ -15,10 +17,7 @@ def qc_cls():
     """Set up basic test class"""
     x = MakeQCShapes(GRID, HABITAT, OUT_FOLDER)
     yield x
-    shps = [x for x in OUT_FOLDER.iterdir()]
-    #if shps:
-    #    for i in shps:
-    #        i.unlink()
+    
 
 def test_class_set_up_with_test_data_and_data_exists(qc_cls):
     """Test instance and data exists"""
@@ -60,3 +59,5 @@ def test_random_points_saved_in_tile_folder(qc_cls):
     gdf_point = gpd.read_file(str(BASE_DIR.joinpath('test/test_data/test_data_out/WV_C20_L14/WV_C20_L14_points.shp')))
     for _, i in gdf_point.iterrows():
         assert gdf_poly['geometry'].contains(i['geometry']).all()
+    assert gdf_point['Interp_num'].dtype == np.int64
+    assert gdf_point['QC_num'].dtype == np.int64

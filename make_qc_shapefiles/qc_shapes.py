@@ -4,6 +4,7 @@ import geopandas as gpd
 from shapely.geometry import Point
 import random
 import fiona
+import numpy as np
 
 class MakeQCShapes:
     """Class to clip habitat map for each polygon in grid"""
@@ -60,17 +61,21 @@ class MakeQCShapes:
             points = self.random_points_in_polygon(num_points, orthoid['geometry'])
             gdf = gpd.GeoDataFrame({'ID': range(50), 'geometry': points})
             gdf['Interp_cls'] = ""
-            gdf['Interp_num'] = ""
+            gdf['Interp_num'] = np.empty(50, dtype=np.int64)
+            gdf['Interp_num'] = 0
             gdf['QC_cls'] = ""
-            gdf['QC_num'] = ""
+            gdf['QC_num'] = np.empty(50, dtype=np.int64)
+            gdf['QC_num'] = 0
             gdf['QC_By'] = ""
             cols = ['ID', 'Interp_cls', 'Interp_num', 'QC_cls', 'QC_num', 'QC_By', 'geometry']
             gdf = gdf[cols]
+            #gdf['Interp_num'] = gdf['Interp_num'].astype(int)
+            #gdf['QC_num'] = gdf['QC_num'].astype(int)
             point_folder = self.out_folder.joinpath(f'{orthoid["OrthoID"]}')
             assert point_folder.exists()
             point_shp = point_folder.joinpath(f'{orthoid["OrthoID"]}_points.shp')
             gdf.crs = {'init' :'epsg:32639'}
-            gdf.to_file(point_shp)
+            gdf.to_file(point_shp, na_rep='NULL')
 
     def random_points_in_polygon(self, number, polygon):
         """Returns n number random points generated within polygon"""
