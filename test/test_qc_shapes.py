@@ -4,7 +4,7 @@ import geopandas as gpd
 import numpy as np 
 import pandas as pd
 
-from make_qc_shapefiles.qc_shapes import MakeQCShapes 
+from make_qc_shapefiles.qc_shapes import MakeQCShapes, make_random_points
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -49,8 +49,8 @@ def test_shapefiles_made_for_each_tile(qc_cls):
 
 def test_random_points_saved_in_tile_folder(qc_cls):
     """Test random points are saved in the folder with the tile and the points are contained by the tile"""
-    qc_cls.make_random_points(qc_cls.grid_gdf)
-    out_folders = [x for x in qc_cls.out_folder.iterdir()]
+    #qc_cls.make_random_points(qc_cls.out_folder)
+    out_folders = [x for x in qc_cls.out_folder.iterdir() if x.name.startswith('WV_')]
     shps = []
     for folder in out_folders:
         shps.append([x.name for x in folder.iterdir() if x.name.endswith('points.shp')][0])
@@ -61,3 +61,19 @@ def test_random_points_saved_in_tile_folder(qc_cls):
         assert gdf_poly['geometry'].contains(i['geometry']).all()
     assert gdf_point['Interp_num'].dtype == np.int64
     assert gdf_point['QC_num'].dtype == np.int64
+
+@pytest.mark.random_function
+def test_standalone_make_random_points_function():
+    """Calling ONLY make_random_points function without object"""
+    out_folder = BASE_DIR.joinpath('test/test_data/test_data_out/test')
+    make_random_points(out_folder)
+    shps = []
+    for folder in out_folder.iterdir():
+        shps.append([x.name for x in folder.iterdir() if x.name.endswith('points.shp')][0])
+    assert 'WV_C18_L12_points.shp' in shps
+    gdf_poly = gpd.read_file(str(BASE_DIR.joinpath('test/test_data/test_data_in/QC_Dissolved.shp')))
+    gdf_point = gpd.read_file(str(BASE_DIR.joinpath('test/test_data/test_data_out/WV_C18_L12/WV_C18_L12_points.shp')))
+    for _, i in gdf_point.iterrows():
+        #assert gdf_poly['geometry'].contains(i['geometry']).all()
+        assert gdf_point['Interp_num'].dtype == np.int64
+        assert gdf_point['QC_num'].dtype == np.int64

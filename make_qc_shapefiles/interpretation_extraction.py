@@ -33,6 +33,8 @@ class ExtractInterpretationToPoints:
             raise ValueError(f"Please check orthoid. There is no folder relating to this orthoid in {str(ROOT_DIR)}.")
         self.tile, self.point = self.get_shapefile_paths(self.orthoid)
         self.gdf_join = self.spatial_join(self.point, self.tile)
+        self.save_point_file(self.gdf_join, self.point)
+        print(f'{self.point.name} has been overwritten in the same location .\nPlease remove the shapefile from GIS and reload to see changes.')
 
     def check_orthoid_exists(self, orthoid):
         """Returns true if folder exists for orthoid
@@ -155,5 +157,7 @@ class CompleteQCAttributes:
 
     def save_pt(self, gdf_join, point):
         """Saves gdf to original shapefile (overwrites)"""
+        if gdf_join['QC_cls'].isnull().any():
+            print(f"The following Point shp IDs' QC_nums are missing, incorrect or not valid. Please check these are correct and rerun function:\n {list(gdf_join['ID'][gdf_join['QC_cls'].isnull()])}")
         gdf_join['QC_By'] = self.name
         gdf_join.to_file(point)

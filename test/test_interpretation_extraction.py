@@ -10,7 +10,7 @@ def test_root_dir_exists():
     """Check config file import directory"""
     assert ROOT_DIR_TEST.exists()
     folders = [x for x in ROOT_DIR_TEST.iterdir()]
-    assert len(folders) == 9
+    assert len(folders) == 10
     assert "WV_C18_L13" in [x.name for x in folders]
     print(ROOT_DIR_TEST)
 
