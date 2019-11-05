@@ -21,7 +21,6 @@ class Window(Frame):
         nameInput.insert(0, 'Name')
         submitButton = Button(self, text="Complete attributes", command= lambda: self.fill_attributes(orthoInput.get(), nameInput.get()))
         quitButton = Button(self, text="Quit", command=self.client_exit)
-        submitButton.place(x=10, y=40)    
         quitButton.place(x=140, y=40)
 
 
