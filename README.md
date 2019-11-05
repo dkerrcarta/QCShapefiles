@@ -1,5 +1,6 @@
 # QCShapefiles
-=================
+---------------
+
 Scripts to assist QC'ing of interpretation of images.
 
 ## Overview
