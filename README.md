@@ -26,4 +26,4 @@ The only field that needs to be edited in the shapefile is QC_subNum (numeric co
 ## Installing package
 
 ### Install Anaconda 
-Download and install the Anaconda Python 3.x version from Anaconda [https://www.anaconda.com/distribution/#download-section]
+Download and install the Anaconda Python 3.x version from [Anaconda] (https://www.anaconda.com/distribution/#download-section).
