@@ -11,9 +11,9 @@ import pandas as pd
 import numpy as np 
 import sys
 
-from make_qc_shapefiles.config import ROOT_DIR_TEST ###needs to be changed to server dir
+from make_qc_shapefiles.config import ROOT_DIR ###needs to be changed to server dir
 
-ROOT_DIR = ROOT_DIR_TEST
+#ROOT_DIR = ROOT_DIR_TEST
 CLS_CSV = Path(__file__).resolve().parent.joinpath('classes.csv')
 CLS_CSV_for_points = CLS_CSV.parent.joinpath('classes_for_points.csv')
 
