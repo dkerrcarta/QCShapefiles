@@ -59,6 +59,8 @@ Install the python packages required to run the scripts. These packages are in t
 
 ```
 
+## Processing files and running scripts
+
 ### Edit shapefiles and extract to points
 1. Edit the habitat shapefiles accordingly, adding only values in the HabitatSub for the edits made. 
 2. Once the edits have been carried, save the shapefile and remove if from the map project
