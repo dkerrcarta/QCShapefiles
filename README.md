@@ -4,9 +4,9 @@ Scripts to assist QC'ing of interpretation of images.
 ## Overview
 
 THE SHAPEFILES REFERRED TO ARE LOCATED AT:
-==================================================================================
+
 \\TCMHarwell\Harwell\ProjectData\2019\PN19032_EAD_Habitat_Mapping\02_Processed_Data\WV_2014_HabitatMap\Habitat_Orthotile_Intersection.
-==================================================================================
+
 THESE FILES CAN BE EDITED LOCALLY, BUT FOR THE SCRIPT TO WORK, THEY NEED TO BE REPLACED IN THE ABOVE DIRECTORY BEFORE RUNNING THE SCRIPTS
 
 The scripts are run in two parts and creates a GUI for each part:
