@@ -4,7 +4,8 @@
 Scripts to assist QC'ing of interpretation of images.
 
 ## Overview
-=================
+--------------
+
 THE SHAPEFILES REFERRED TO ARE LOCATED AT:
 
 \\TCMHarwell\Harwell\ProjectData\2019\PN19032_EAD_Habitat_Mapping\02_Processed_Data\WV_2014_HabitatMap\Habitat_Orthotile_Intersection.
@@ -26,7 +27,8 @@ Following QC'ing of random point samples, this script can be run to fill in addi
 The only field that needs to be edited in the shapefile is QC_subNum (numeric code for habitat subtype). If any fields are changed, or if polygons are added/edited, the respective additional fields will be updated accordingly.
 
 ## Installing package
-=====================
+-----------------------
+
 
 ### Install Anaconda (This only needs to be done once)
 Download and install the Anaconda Python 3.x version from [Anaconda](https://www.anaconda.com/distribution/#download-section).
@@ -63,7 +65,7 @@ Install the python packages required to run the scripts. These packages are in t
 ```
 
 ## Processing files and running scripts
-=========================================
+---------------------------------------
 
 ### Edit shapefiles and extract to points
 1. Edit the habitat shapefiles accordingly, adding only values in the HabitatSub for the edits made. 
