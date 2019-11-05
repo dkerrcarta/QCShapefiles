@@ -30,21 +30,26 @@ Download and install the Anaconda Python 3.x version from [Anaconda](https://www
 
 ### Set up environment (This only needs to be done once)
 Once Anaconda is installed, open the Anaconda Prompt (Anaconda3) terminal from the start menu and and input the following:
-'''
+
+```
 (base) C:\Users\User>conda create --name qc_gui python=3.6
-'''
+```
 Type 'y' when prompted.
 Change directory to the folder in which this package has been downloaded:
-'''
+
+```
 (base) C:\Users\User>cd Path/to/directory/of/QCShapfiles
-'''
+```
 Start new environment:
-'''
+
+```
 (base) F:\Documents\QCShapfiles>conda activate qc_gui
 
 (qc_gui) F:\Documents\QCShapfiles>
-'''
+```
 Install the python packages required to run the scripts. These packages are in the requirements.txt file in the package directory:
-'''
+
+```
 (qc_gui) F:\Documents\QCShapfiles>conda install -f -y -q --name qc_gui  --file requirements.txt
-'''
+```
+
