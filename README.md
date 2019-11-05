@@ -2,6 +2,7 @@
 Scripts to assist QC'ing of interpretation of images.
 
 ## Overview
+
 THE SHAPEFILES REFERRED TO ARE LOCATED AT:
 ==================================================================================
 \\TCMHarwell\Harwell\ProjectData\2019\PN19032_EAD_Habitat_Mapping\02_Processed_Data\WV_2014_HabitatMap\Habitat_Orthotile_Intersection.
