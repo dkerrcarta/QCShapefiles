@@ -40,7 +40,7 @@ def test_gdf_of_shps_made(qc_cls):
 
 def test_shapefiles_made_for_each_tile(qc_cls):
     """Shapefile made for each of the tiles"""
-    out_folders = [x for x in qc_cls.out_folder.iterdir()]
+    out_folders = [x for x in qc_cls.out_folder.iterdir()if not x.name == 'test']
     shps = []
     for folder in out_folders:
         shps.append([x.name for x in folder.iterdir() if x.name.endswith('.shp') if not x.name.endswith('points.shp')][0])
@@ -59,8 +59,10 @@ def test_random_points_saved_in_tile_folder(qc_cls):
     gdf_point = gpd.read_file(str(BASE_DIR.joinpath('test/test_data/test_data_out/WV_C20_L14/WV_C20_L14_points.shp')))
     for _, i in gdf_point.iterrows():
         assert gdf_poly['geometry'].contains(i['geometry']).all()
-    assert gdf_point['Interp_num'].dtype == np.int64
+    assert gdf_point['Int_num'].dtype == np.int64
     assert gdf_point['QC_num'].dtype == np.int64
+    cols = ['ID', 'Int_cls', 'Int_num', 'Int_subCls', 'Int_subNum', 'QC_cls', 'QC_num', 'QC_subCls', 'QC_subNum', 'QC_By', 'geometry']
+    assert list(gdf_point.columns) == cols
 
 @pytest.mark.random_function
 def test_standalone_make_random_points_function():
@@ -75,5 +77,5 @@ def test_standalone_make_random_points_function():
     gdf_point = gpd.read_file(str(BASE_DIR.joinpath('test/test_data/test_data_out/WV_C18_L12/WV_C18_L12_points.shp')))
     for _, i in gdf_point.iterrows():
         #assert gdf_poly['geometry'].contains(i['geometry']).all()
-        assert gdf_point['Interp_num'].dtype == np.int64
+        assert gdf_point['Int_num'].dtype == np.int64
         assert gdf_point['QC_num'].dtype == np.int64

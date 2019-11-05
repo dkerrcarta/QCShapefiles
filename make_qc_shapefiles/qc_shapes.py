@@ -70,14 +70,20 @@ class MakeQCShapes:
             for _, orthoid in grid_gdf.iterrows():
                 points = self.random_points_in_polygon(num_points, orthoid['geometry'])
                 gdf = gpd.GeoDataFrame({'ID': range(50), 'geometry': points})
-                gdf['Interp_cls'] = ""
-                gdf['Interp_num'] = np.empty(50, dtype=np.int64)
-                gdf['Interp_num'] = 0
+                gdf['Int_cls'] = ""
+                gdf['Int_num'] = np.empty(50, dtype=np.int64)
+                gdf['Int_num'] = 0
+                gdf['Int_subCls'] = ""
+                gdf['Int_subNum'] = np.empty(50, dtype=np.int64)
+                gdf['Int_subNum'] = 0
                 gdf['QC_cls'] = ""
                 gdf['QC_num'] = np.empty(50, dtype=np.int64)
                 gdf['QC_num'] = 0
+                gdf['QC_subCls'] = ""
+                gdf['QC_subNum'] = np.empty(50, dtype=np.int64)
+                gdf['QC_subNum'] = 0
                 gdf['QC_By'] = ""
-                cols = ['ID', 'Interp_cls', 'Interp_num', 'QC_cls', 'QC_num', 'QC_By', 'geometry']
+                cols = ['ID', 'Int_cls', 'Int_num', 'Int_subCls', 'Int_subNum', 'QC_cls', 'QC_num', 'QC_subCls', 'QC_subNum', 'QC_By', 'geometry']
                 gdf = gdf[cols]
                 point_folder = self.out_folder.joinpath(f'{folder.name}')
                 assert point_folder.exists()
@@ -99,7 +105,7 @@ class MakeQCShapes:
 
 def make_random_points(out_folder, num_points=50):
         """Creates num_points randomly within each polygon of grid_gdf"""
-        folders = [x for x in out_folder.iterdir() if x.name.startswith('WV_')]
+        folders = sorted([x for x in out_folder.iterdir() if x.name.startswith('WV_')])
         for folder in folders:
             shp = folder.joinpath(f'{folder.name}.shp')
             grid_gdf = gpd.read_file(shp)
@@ -107,14 +113,20 @@ def make_random_points(out_folder, num_points=50):
             for _, orthoid in grid_gdf.iterrows():
                 points = random_points_in_polygon(num_points, orthoid['geometry'])
                 gdf = gpd.GeoDataFrame({'ID': range(50), 'geometry': points})
-                gdf['Interp_cls'] = ""
-                gdf['Interp_num'] = np.empty(50, dtype=np.int64)
-                gdf['Interp_num'] = 0
+                gdf['Int_cls'] = ""
+                gdf['Int_num'] = np.empty(50, dtype=np.int64)
+                gdf['Int_num'] = 0
+                gdf['Int_subCls'] = ""
+                gdf['Int_subNum'] = np.empty(50, dtype=np.int64)
+                gdf['Int_subNum'] = 0
                 gdf['QC_cls'] = ""
                 gdf['QC_num'] = np.empty(50, dtype=np.int64)
                 gdf['QC_num'] = 0
+                gdf['QC_subCls'] = ""
+                gdf['QC_subNum'] = np.empty(50, dtype=np.int64)
+                gdf['QC_subNum'] = 0
                 gdf['QC_By'] = ""
-                cols = ['ID', 'Interp_cls', 'Interp_num', 'QC_cls', 'QC_num', 'QC_By', 'geometry']
+                cols = ['ID', 'Int_cls', 'Int_num', 'Int_subCls', 'Int_subNum', 'QC_cls', 'QC_num', 'QC_subCls', 'QC_subNum', 'QC_By', 'geometry']
                 gdf = gdf[cols]
                 point_folder = out_folder.joinpath(f'{folder.name}')
                 assert point_folder.exists()

@@ -15,6 +15,7 @@ from make_qc_shapefiles.config import ROOT_DIR_TEST ###needs to be changed to se
 
 ROOT_DIR = ROOT_DIR_TEST
 CLS_CSV = Path(__file__).resolve().parent.joinpath('classes.csv')
+CLS_CSV_for_points = CLS_CSV.parent.joinpath('classes_for_points.csv')
 
 
 class ExtractInterpretationToPoints:
@@ -32,9 +33,11 @@ class ExtractInterpretationToPoints:
         else:
             raise ValueError(f"Please check orthoid. There is no folder relating to this orthoid in {str(ROOT_DIR)}.")
         self.tile, self.point = self.get_shapefile_paths(self.orthoid)
-        self.gdf_join = self.spatial_join(self.point, self.tile)
+        self.tile_overwritten = self.pre_fill_fields_based_on_Int_subNum(self.tile)
+        self.gdf_join = self.spatial_join(self.point, self.tile_overwritten)
         self.save_point_file(self.gdf_join, self.point)
         print(f'{self.point.name} has been overwritten in the same location .\nPlease remove the shapefile from GIS and reload to see changes.')
+        print(f'{self.tile_overwritten.name} has been saved with new habitat values')
 
     def check_orthoid_exists(self, orthoid):
         """Returns true if folder exists for orthoid
@@ -68,6 +71,41 @@ class ExtractInterpretationToPoints:
         else:
            return tile, point
 
+    def pre_fill_fields_based_on_Int_subNum(self, tile):
+        """Overwrites tile based on join between tile and CLS_CSV, filling all class fields based on tile 'Habitat_sub'
+        
+        Parameters
+        tile:: (str/Path) --> Path to tile shapefile
+
+        Returns
+        tile:: (str/Path) --> Path to overwritten tile
+        
+        """
+        df = pd.read_csv(CLS_CSV)
+        gdf = gpd.read_file(tile)
+        gdf_cols = gdf.columns
+        df['HabitatSub'] = df['Int_SubNum']
+        join_df = gdf.merge(df, on='HabitatSub', how='left')
+        join_df['HabitatTyp'] = join_df['Int_num']
+        join_df['HabitatT_1'] = join_df['Int_cls']
+        join_df['HabitatS_1'] = join_df['Int_SubCls']
+        join_df['MMU_HA'] = join_df['MMU_']
+        join_df['Area_KM'] = join_df['geometry'].area / 10**6
+        join_df['Area_HA'] = join_df['geometry'].area / 10**4
+        #for i in range(len(join_df)):
+        #    join_df['ID'][i] = i 
+        join_df['Id'] = [x for x in range(len(join_df))]
+        join_df['OrthoID'] = self.orthoid
+
+        
+        #Remove fields joined from table and save
+        join_df = join_df[gdf_cols]
+        out_tile = tile.parent.joinpath(tile.stem + '_interp.shp')
+        join_df.to_file(out_tile)
+
+        #return path to tile
+        return out_tile
+
     def spatial_join(self, point, tile):
         """Returns gdf of joined shapefiles, with only columns in point remaning (Num and Cls are filled from joined table)
         
@@ -81,9 +119,11 @@ class ExtractInterpretationToPoints:
         gdf_pt = gpd.read_file(point)
         gdf_tile = gpd.read_file(tile)
         join_df = gpd.sjoin(gdf_pt, gdf_tile, op='within')
-        join_df['Interp_cls'] = join_df['HabitatS_1']
-        join_df['Interp_num'] = join_df['HabitatSub']
-        cols = ['ID', 'Interp_cls', 'Interp_num', 'QC_cls', 'QC_num', 'QC_By', 'geometry']
+        join_df['Int_subCls'] = join_df['HabitatS_1']
+        join_df['Int_subNum'] = join_df['HabitatSub']
+        join_df['Int_cls'] = join_df['HabitatT_1']
+        join_df['Int_num'] = join_df['HabitatTyp']
+        cols = ['ID', 'Int_cls', 'Int_num', 'Int_subCls', 'Int_subNum',  'QC_cls', 'QC_num', 'QC_subCls', 'QC_subNum', 'QC_By', 'geometry']
         join_df = join_df[cols]
         return join_df
         
@@ -104,7 +144,7 @@ class CompleteQCAttributes:
             raise ValueError(f"Please check orthoid. There is no folder relating to this orthoid in {str(ROOT_DIR)}.")
         self.name = name
         self.point = self.get_shapefile_paths(self.orthoid)
-        self.join_gdf = self.join_pt_to_csv(self.point, CLS_CSV)
+        self.join_gdf = self.join_pt_to_csv(self.point, CLS_CSV_for_points)
         self.save_pt(self.join_gdf, self.point)
 
 
@@ -147,17 +187,31 @@ class CompleteQCAttributes:
         csv:: (Path) --> Path to csv with classes
         """
         gdf = gpd.read_file(point)
+        gdf['QC_subNum'] = gdf['QC_subNum'].astype(int)
         df = pd.read_csv(csv)
-        df['QC_num'] = df['num']
-        gdf = gdf.merge(df, on='QC_num', how='left')
-        gdf['QC_cls'] = gdf['cls']
-        cols = ['ID', 'Interp_cls', 'Interp_num', 'QC_cls', 'QC_num', 'QC_By', 'geometry']
+        df['QC_subNum'] = df['Int_SubNum_csv']
+        gdf = gdf.merge(df, on='QC_subNum', how='left')
+        gdf['QC_subCls'] = gdf['Int_SubCls_csv']
+        gdf['QC_cls'] = gdf['Int_cls_csv']
+        gdf['QC_subNum'] = gdf['Int_SubNum_csv'].astype(int)
+        gdf['QC_num'] = gdf['Int_num_csv'].astype(int)
+        print(gdf['QC_num'].dtype)
+        cols = ['ID', 'Int_cls', 'Int_num', 'Int_subCls', 'Int_subNum', 'QC_cls', 'QC_num', 'QC_subNum', 'QC_subCls', 'QC_By', 'geometry']
+        
+        #gdf['Int_cls'] = gdf['Int_cls_x']
+        #gdf['Int_num'] = gdf['Int_cls_x']
         gdf = gdf[cols]
         return gdf
 
     def save_pt(self, gdf_join, point):
         """Saves gdf to original shapefile (overwrites)"""
-        if gdf_join['QC_cls'].isnull().any():
-            print(f"The following Point shp IDs' QC_nums are missing, incorrect or not valid. Please check these are correct and rerun function:\n {list(gdf_join['ID'][gdf_join['QC_cls'].isnull()])}")
+        if gdf_join['QC_subNum'].isnull().any():
+            print(f"The following Point shp IDs' QC_nums are missing, incorrect or not valid. Please check these are correct and rerun function:\n {list(gdf_join['ID'][gdf_join['QC_subCls'].isnull()])}")
+        schema = {
+            'geometry': 'Point',
+            'properties': {
+                'QC_num': 'int',
+                'QC_subNum': 'int',
+        }}
         gdf_join['QC_By'] = self.name
         gdf_join.to_file(point)
